@@ -1,0 +1,60 @@
+digraph G
+{
+    rankdir = TB;
+    dpi=200;
+    "Valores:"[shape=plaintext, fontcolor=red, fontsize=18];
+    "Indices:"[shape=plaintext, fontcolor=red, fontsize=18];
+    "Valores:" -> "Indices:" [color=white];
+    
+    node3
+    [
+        shape = none
+        label = <<table border="0" cellspacing="0">
+                    <tr>
+                    <td port="p1" border="1" width="50" bgcolor="#1ac6ff">i</td>
+                    <td port="p2" border="1" width="50" bgcolor="#00ffbf">j</td>
+                    <td port="p3" border="1" width="50" >Key: 300</td>
+                    </tr>
+                </table>>
+    ]
+
+node1
+    [
+        shape = none
+        label = <<table border="0" cellspacing="0">
+                    <tr>
+<td border="1" width="80" >20</td>
+<td border="1" width="80" >30</td>
+<td border="1" width="80" >50</td>
+<td border="1" width="80" >80</td>
+<td border="1" width="80" >100</td>
+<td border="1" width="80" >100</td>
+<td border="1" width="80" bgcolor="#00ffbf">200</td>
+<td border="1" width="80" bgcolor="#1ac6ff">300</td>
+                    </tr>
+                </table>>
+    ]
+    
+    node2
+    [
+        shape = none
+        label = <<table border="0" cellspacing="0">
+                    <tr><td border="0" width="80">0</td>
+<td border="0" width="80">1</td>
+<td border="0" width="80">2</td>
+<td border="0" width="80">3</td>
+<td border="0" width="80">4</td>
+<td border="0" width="80">5</td>
+<td border="0" width="80">6</td>
+<td border="0" width="80">7</td>
+                    </tr>
+                </table>>
+    ]
+    
+    node1 -> node2[ style = invis ];
+    node3 -> node1[ style = invis ];
+    
+    { rank=same; "Valores:"; node1 }
+    { rank=same; "Indices:"; node2 }
+    
+}
