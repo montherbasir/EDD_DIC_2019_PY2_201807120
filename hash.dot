@@ -1,0 +1,68 @@
+digraph G
+{
+    rankdir = TB;
+    dpi=300;
+    
+    node1
+    [
+        shape = none
+        label = <<table border="0" cellspacing="0">
+        <tr><td border="1" width="80">Indice</td>        <td border="1" width="80">Carne</td>        <td border="1" width="80">Nombre</td>        <td border="1" width="80">Apellido</td>        <td border="1" width="80">Password</td>        </tr>      <tr>
+<td border="1" width="80">0</td>
+      <td border="1" width="80">70</td>
+      <td border="1" width="80">n1</td>
+      <td border="1" width="80">a</td>
+      <td border="1" width="80">1234</td>
+</tr>
+      <tr>
+<td border="1" width="80">19</td>
+      <td border="1" width="80">292</td>
+      <td border="1" width="80">n1</td>
+      <td border="1" width="80">a</td>
+      <td border="1" width="80">1234</td>
+</tr>
+      <tr>
+<td border="1" width="80">22</td>
+      <td border="1" width="80">255</td>
+      <td border="1" width="80">n1</td>
+      <td border="1" width="80">a</td>
+      <td border="1" width="80">1234</td>
+</tr>
+      <tr>
+<td border="1" width="80">25</td>
+      <td border="1" width="80">218</td>
+      <td border="1" width="80">n1</td>
+      <td border="1" width="80">a</td>
+      <td border="1" width="80">1234</td>
+</tr>
+      <tr>
+<td border="1" width="80">28</td>
+      <td border="1" width="80">181</td>
+      <td border="1" width="80">n1</td>
+      <td border="1" width="80">a</td>
+      <td border="1" width="80">1234</td>
+</tr>
+      <tr>
+<td border="1" width="80">31</td>
+      <td border="1" width="80">144</td>
+      <td border="1" width="80">n1</td>
+      <td border="1" width="80">a</td>
+      <td border="1" width="80">1234</td>
+</tr>
+      <tr>
+<td border="1" width="80">33</td>
+      <td border="1" width="80">33</td>
+      <td border="1" width="80">n1</td>
+      <td border="1" width="80">a</td>
+      <td border="1" width="80">1234</td>
+</tr>
+      <tr>
+<td border="1" width="80">34</td>
+      <td border="1" width="80">107</td>
+      <td border="1" width="80">n1</td>
+      <td border="1" width="80">a</td>
+      <td border="1" width="80">1234</td>
+</tr>
+                </table>>
+    ]
+}
