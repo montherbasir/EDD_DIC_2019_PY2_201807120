@@ -154,12 +154,22 @@ public class HashTable implements Runnable{
         }else{
             int i = 0;
             int index = ind;
+            System.out.println(index);
+            if((index==(capacidad-1))&&(bucketArray[0]!=null)&&(bucketArray[capacidad-1]!=null)){
+                crecer();
+                //add(value);
+            }
             while(bucketArray[index]!=null){
-                index = (value.getCarne() % capacidad + 1 ) * i;
+                //System.out.println("carne "+value.getCarne());
+                //System.out.println("i "+i);
+                index = (Math.floorMod(value.getCarne(),capacidad)+ 1 ) * i;
                 i++;
+                //System.out.println("index 1 "+index);
                 if(index>capacidad-1){
-                    index = index % capacidad;
+                    index--;
+                    index = Math.floorMod(index, capacidad);
                 }
+                //System.out.println("index 2 "+index);
             }
             bucketArray[index] = new HashNode(value);
         }
@@ -168,21 +178,25 @@ public class HashTable implements Runnable{
         // If load factor goes beyond threshold, then
         // double hash table size
         System.out.println("size "+size+" cap "+capacidad);
-        if ((1.0*size)/capacidad > 0.55)
+        if ((1.0*size)/capacidad >= 0.55)
         {
-            System.out.println("crecio");
-            HashNode[] temp = bucketArray;
-            capacidad = PRIMOS[redimension];
-            redimension++;
-            bucketArray = new HashNode[capacidad];
-            size = 0;
+            crecer();
+        }
+    }
 
-            for (HashNode headNode : temp)
+    private void crecer(){
+        System.out.println("crecio");
+        HashNode[] temp = bucketArray;
+        capacidad = PRIMOS[redimension];
+        redimension++;
+        bucketArray = new HashNode[capacidad];
+        size = 0;
+
+        for (HashNode headNode : temp)
+        {
+            if (headNode != null)
             {
-                if (headNode != null)
-                {
-                    add(headNode.getUsuario());
-                }
+                add(headNode.getUsuario());
             }
         }
     }
