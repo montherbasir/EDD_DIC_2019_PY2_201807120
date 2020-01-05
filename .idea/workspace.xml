@@ -40,9 +40,14 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
   </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Monther\Documents\EDD_DIC_2019_PY2_201807120\src\UI" />
+    </key>
+  </component>
   <component name="RunManager">
-    <configuration name="Visualizador" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Visualizador" />
+    <configuration name="Principal" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="UI.Principal" />
       <module name="EDD_DIC_2019_PY2_201807120" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -76,6 +81,8 @@
       <workItem from="1577503738449" duration="24615000" />
       <workItem from="1577725886243" duration="726000" />
       <workItem from="1577747550468" duration="22280000" />
+      <workItem from="1578015585128" duration="4890000" />
+      <workItem from="1578179320976" duration="8102000" />
     </task>
     <servers />
   </component>
@@ -87,18 +94,18 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="362" y="64" key="#Project_Structure/0.0.1536.824@0.0.1536.824" timestamp="1577411997555" />
-    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577935631106">
+    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578017782986">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1577935631106" />
-    <state x="875" y="182" key="#com.intellij.ide.util.MemberChooser" timestamp="1577931091210">
+    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1578017782986" />
+    <state x="875" y="182" key="#com.intellij.ide.util.MemberChooser" timestamp="1578185815142">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="875" y="182" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1577931091210" />
-    <state x="498" y="197" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1577935629915">
+    <state x="875" y="182" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1578185815142" />
+    <state x="498" y="197" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1578017782057">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="498" y="197" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.824@0.0.1536.824" timestamp="1577935629915" />
+    <state x="498" y="197" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.824@0.0.1536.824" timestamp="1578017782057" />
     <state x="498" y="203" key="#com.intellij.ide.util.TreeFileChooserDialog" timestamp="1577421039186">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -107,22 +114,22 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="502" y="155" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1577506586082" />
-    <state width="1493" height="261" key="GridCell.Tab.0.bottom" timestamp="1577938382468">
+    <state width="1493" height="151" key="GridCell.Tab.0.bottom" timestamp="1578191840457">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1577938382468" />
-    <state width="1493" height="261" key="GridCell.Tab.0.center" timestamp="1577938382468">
+    <state width="1493" height="151" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1578191840457" />
+    <state width="1493" height="151" key="GridCell.Tab.0.center" timestamp="1578191840456">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1577938382468" />
-    <state width="1493" height="261" key="GridCell.Tab.0.left" timestamp="1577938382468">
+    <state width="1493" height="151" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1578191840456" />
+    <state width="1493" height="151" key="GridCell.Tab.0.left" timestamp="1578191840456">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1577938382468" />
-    <state width="1493" height="261" key="GridCell.Tab.0.right" timestamp="1577938382468">
+    <state width="1493" height="151" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1578191840456" />
+    <state width="1493" height="151" key="GridCell.Tab.0.right" timestamp="1578191840457">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1577938382468" />
+    <state width="1493" height="151" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1578191840457" />
     <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1577938382468">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -147,9 +154,9 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="498" height="446" key="SwitcherDM/0.0.1536.824@0.0.1536.824" timestamp="1577753850064" />
-    <state x="419" y="229" key="com.intellij.ide.util.TipDialog" timestamp="1577747610929">
+    <state x="419" y="229" key="com.intellij.ide.util.TipDialog" timestamp="1578252010969">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="419" y="229" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1577747610929" />
+    <state x="419" y="229" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1578252010969" />
   </component>
 </project>

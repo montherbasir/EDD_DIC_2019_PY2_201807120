@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 
 class HashNode
 {
@@ -129,16 +130,24 @@ public class HashTable implements Runnable{
             if(bucketArray[ind].getKey()==key){
                 u= bucketArray[ind].getUsuario();
             }else{
-                int i = 0;
-                int index = ind;
-                while(bucketArray[index]!=null){
-                    if(bucketArray[index].getKey()==key){
-                        u = bucketArray[index].getUsuario();
-                        break;
-                    }else{
-                        index = (key % capacidad + 1 ) * i;
-                        i++;
+                try {
+                    int i = 0;
+                    int index = ind;
+                    while (bucketArray[index] != null) {
+                        if (bucketArray[index].getKey() == key) {
+                            u = bucketArray[index].getUsuario();
+                            break;
+                        } else {
+                            index = (key % 7 + 1) * i;
+                            i++;
+                            if (index > capacidad - 1) {
+                                index--;
+                                index = Math.floorMod(index, capacidad);
+                            }
+                        }
                     }
+                }catch(Exception e){
+                    System.out.println("Error");
                 }
             }
         }
@@ -156,13 +165,14 @@ public class HashTable implements Runnable{
             int index = ind;
             System.out.println(index);
             if((index==(capacidad-1))&&(bucketArray[0]!=null)&&(bucketArray[capacidad-1]!=null)){
+                System.out.println("SOy yo bb");
                 crecer();
                 //add(value);
             }
             while(bucketArray[index]!=null){
                 //System.out.println("carne "+value.getCarne());
                 //System.out.println("i "+i);
-                index = (Math.floorMod(value.getCarne(),capacidad)+ 1 ) * i;
+                index = (Math.floorMod(value.getCarne(),7)+ 1 ) * i;
                 i++;
                 //System.out.println("index 1 "+index);
                 if(index>capacidad-1){
@@ -177,7 +187,7 @@ public class HashTable implements Runnable{
 
         // If load factor goes beyond threshold, then
         // double hash table size
-        System.out.println("size "+size+" cap "+capacidad);
+        //System.out.println("size "+size+" cap "+capacidad);
         if ((1.0*size)/capacidad >= 0.55)
         {
             crecer();
@@ -233,7 +243,7 @@ public class HashTable implements Runnable{
                 graph.append("      <td border=\"1\" width=\"80\">").append(usr.getCarne()).append("</td>\n");
                 graph.append("      <td border=\"1\" width=\"80\">").append(usr.getNombre()).append("</td>\n");
                 graph.append("      <td border=\"1\" width=\"80\">").append(usr.getApellido()).append("</td>\n");
-                graph.append("      <td border=\"1\" width=\"80\">").append(usr.getPassword()).append("</td>\n</tr>\n");
+                graph.append("      <td border=\"1\" width=\"80\">").append(Arrays.toString(usr.getPassword())).append("</td>\n</tr>\n");
             }
             y++;
         }
@@ -254,7 +264,7 @@ public class HashTable implements Runnable{
         Thread.sleep(1000);
         BufferedImage img= ImageIO.read(new File("hash.png"));
         Thread.sleep(100);
-        thumb.setIcon(new ImageIcon(scaleimage(900,2000,img)));
+        thumb.setIcon(new ImageIcon(scaleimage(3000,2000,img)));
         System.out.println("jala");
         mover = false;
 

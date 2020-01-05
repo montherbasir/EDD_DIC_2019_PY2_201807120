@@ -1,4 +1,5 @@
 package ordenamiento;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,7 +15,7 @@ import org.json.simple.parser.ParseException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-public class Arreglo implements Runnable{
+public class Arreglo implements Runnable {
     public long[] arreglo;
     public int size;
     private Thread hilo;
@@ -23,8 +24,17 @@ public class Arreglo implements Runnable{
     private boolean mover;
     private int alg;
     private JLabel thumb;
+    private JLabel desc;
 
-    public Arreglo(String ruta){
+    public JLabel getDesc() {
+        return desc;
+    }
+
+    public void setDesc(JLabel desc) {
+        this.desc = desc;
+    }
+
+    public Arreglo(String ruta) {
         JSONParser jsonParser = new JSONParser();
 
         try (FileReader reader = new FileReader(ruta)) {
@@ -39,8 +49,8 @@ public class Arreglo implements Runnable{
             this.arreglo = new long[this.size];
 
             // Iterate over employee array
-            for (int i=0; i<this.size; i++) {
-                this.arreglo[i]=parseObject((JSONObject) numArray.get(i));
+            for (int i = 0; i < this.size; i++) {
+                this.arreglo[i] = parseObject((JSONObject) numArray.get(i));
             }
 
         } catch (IOException | ParseException | NullPointerException e) {
@@ -76,7 +86,7 @@ public class Arreglo implements Runnable{
         this.size = size;
     }
 
-    public void Bsort(){
+    public void Bsort() {
         try {
             mover = true;
             pausado = false;
@@ -84,7 +94,7 @@ public class Arreglo implements Runnable{
             hilo = new Thread(this, "Bsort");
             hilo.start();
             Thread.sleep(200);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -96,26 +106,29 @@ public class Arreglo implements Runnable{
             for (int j = i + 1; j < this.size; j++) {
                 try {
                     graficar(i, j, thumb);
-                    Thread.sleep(500);
-                    System.out.println("hola "+i+" "+j);
+                    desc.setText("Comparando " + this.arreglo[i] + " Con " + this.arreglo[j]);
+                    Thread.sleep(700);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                ;
                 if (this.arreglo[i] > this.arreglo[j]) {
+                    desc.setText(this.arreglo[i] + " si es mayor, intercambio");
                     aux = this.arreglo[i];
                     this.arreglo[i] = this.arreglo[j];
                     this.arreglo[j] = aux;
                 }
-                //Thread.sleep(2000);
+                Thread.sleep(500);
             }
         }
         Thread.sleep(500);
-        graficar(size-2, size-1, thumb);
+        graficar(size - 2, size - 1, thumb);
+        desc.setText("Terminado");
         mover = false;
         print();
     }
 
-    public void Isort(){
+    public void Isort() {
         try {
             mover = true;
             pausado = false;
@@ -123,7 +136,7 @@ public class Arreglo implements Runnable{
             hilo = new Thread(this, "Isort");
             hilo.start();
             Thread.sleep(200);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -134,7 +147,7 @@ public class Arreglo implements Runnable{
             int j = i - 1;
             try {
                 graficarInsertion(i, j, key, thumb);
-                Thread.sleep(2000);
+                Thread.sleep(1100);
 //                    System.out.println("hola "+i+" "+j);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -143,26 +156,29 @@ public class Arreglo implements Runnable{
             /* Move elements of arr[0..i-1], that are
                greater than key, to one position ahead
                of their current position */
-            while (j >= 0 && this.arreglo[j] > key) {
-                try {
+            try {
+                desc.setText("Comparando la clave " + key + " con sus antecesores");
+                Thread.sleep(500);
+                while (j >= 0 && this.arreglo[j] > key) {
+                    desc.setText("La clave " + key + " es menor que " + this.arreglo[j]);
                     graficarInsertion(i, j, key, thumb);
-                    Thread.sleep(2000);
-//                    System.out.println("hola "+i+" "+j);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    Thread.sleep(1100);
+                    this.arreglo[j + 1] = this.arreglo[j];
+                    j = j - 1;
                 }
-                this.arreglo[j + 1] = this.arreglo[j];
-                j = j - 1;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             this.arreglo[j + 1] = key;
         }
         try {
             Thread.sleep(200);
-            graficarInsertion(size-1, size-2, arreglo[size-1],thumb);
+            graficarInsertion(size - 1, size - 2, arreglo[size - 1], thumb);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        mover=false;
+        desc.setText("Terminado");
+        mover = false;
     }
 
     /* This function takes last element as pivot,
@@ -227,7 +243,7 @@ public class Arreglo implements Runnable{
         StringBuilder graph = new StringBuilder("digraph G\n" +
                 "{\n" +
                 "    rankdir = TB;\n" +
-                "    dpi=200;\n"+
+                "    dpi=200;\n" +
                 "    \"Valores:\"[shape=plaintext, fontcolor=red, fontsize=18];\n" +
                 "    \"Indices:\"[shape=plaintext, fontcolor=red, fontsize=18];\n" +
                 "    \"Valores:\" -> \"Indices:\" [color=white];\n" +
@@ -243,7 +259,7 @@ public class Arreglo implements Runnable{
                 "                </table>>\n" +
                 "    ]\n\n");
 
-        graphBody(graph,i,j,thumb);
+        graphBody(graph, i, j, thumb);
 
     }
 
@@ -251,7 +267,7 @@ public class Arreglo implements Runnable{
         StringBuilder graph = new StringBuilder("digraph G\n" +
                 "{\n" +
                 "    rankdir = TB;\n" +
-                "    dpi=200;\n"+
+                "    dpi=200;\n" +
                 "    \"Valores:\"[shape=plaintext, fontcolor=red, fontsize=18];\n" +
                 "    \"Indices:\"[shape=plaintext, fontcolor=red, fontsize=18];\n" +
                 "    \"Valores:\" -> \"Indices:\" [color=white];\n" +
@@ -263,12 +279,12 @@ public class Arreglo implements Runnable{
                 "                    <tr>\n" +
                 "                    <td port=\"p1\" border=\"1\" width=\"50\" bgcolor=\"#1ac6ff\">i</td>\n" +
                 "                    <td port=\"p2\" border=\"1\" width=\"50\" bgcolor=\"#00ffbf\">j</td>\n" +
-                "                    <td port=\"p3\" border=\"1\" width=\"50\" >Key: "+key+"</td>\n" +
+                "                    <td port=\"p3\" border=\"1\" width=\"50\" >Key: " + key + "</td>\n" +
                 "                    </tr>\n" +
                 "                </table>>\n" +
                 "    ]\n\n");
 
-        graphBody(graph,i,j,thumb);
+        graphBody(graph, i, j, thumb);
 
     }
 
@@ -278,13 +294,13 @@ public class Arreglo implements Runnable{
         int a = 0;
         for (long l : this.arreglo) {
             graph.append("<td border=\"1\" width=\"80\" ");
-            if(a==i){
+            if (a == i) {
                 graph.append("bgcolor=\"#1ac6ff\"");
-                System.out.println("i = "+a);
+                System.out.println("i = " + a);
             }
-            if(a==j){
+            if (a == j) {
                 graph.append("bgcolor=\"#00ffbf\"");
-                System.out.println("j = "+a);
+                System.out.println("j = " + a);
             }
             graph.append(">").append(l).append("</td>\n");
             a++;
@@ -328,48 +344,49 @@ public class Arreglo implements Runnable{
 
         String command = "dot -Tpng arr.dot -o arr.png";
         Process p = Runtime.getRuntime().exec(command);
-        Thread.sleep(300);
-        BufferedImage img= ImageIO.read(new File("arr.png"));
-        Thread.sleep(300);
-        thumb.setIcon(new ImageIcon(scaleimage(1000,400,img)));
+        Thread.sleep(400);
+        p.destroy();
+        BufferedImage img = ImageIO.read(new File("arr.png"));
+        Thread.sleep(200);
+        thumb.setIcon(new ImageIcon(scaleimage(1000, 400, img)));
     }
 
     @Override
     public void run() {
-        while(mover) {
-            synchronized(clave){
-                    try {
-                        switch (alg) {
-                            case 1:
-                                bubbleSort();
-                                break;
-                            case 2:
-                                insertionSort();
-                                break;
-                        }
-                    }catch (Exception ex){
-                        ex.printStackTrace();
+        while (mover) {
+            synchronized (clave) {
+                try {
+                    switch (alg) {
+                        case 1:
+                            bubbleSort();
+                            break;
+                        case 2:
+                            insertionSort();
+                            break;
                     }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
     }
 
-    private Image scaleimage(int wid, int hei, BufferedImage img){
+    private Image scaleimage(int wid, int hei, BufferedImage img) {
         Image im = img;
         double scale;
         double imw = img.getWidth();
         double imh = img.getHeight();
-        if (wid > imw && hei > imh){
+        if (wid > imw && hei > imh) {
             im = img;
-        }else if(wid/imw < hei/imh){
-            scale = wid/imw;
-            im = img.getScaledInstance((int) (scale*imw), (int) (scale*imh), Image.SCALE_SMOOTH);
-        }else if (wid/imw > hei/imh){
-            scale = hei/imh;
-            im = img.getScaledInstance((int) (scale*imw), (int) (scale*imh), Image.SCALE_SMOOTH);
-        }else if (wid/imw == hei/imh){
-            scale = wid/imw;
-            im = img.getScaledInstance((int) (scale*imw), (int) (scale*imh), Image.SCALE_SMOOTH);
+        } else if (wid / imw < hei / imh) {
+            scale = wid / imw;
+            im = img.getScaledInstance((int) (scale * imw), (int) (scale * imh), Image.SCALE_SMOOTH);
+        } else if (wid / imw > hei / imh) {
+            scale = hei / imh;
+            im = img.getScaledInstance((int) (scale * imw), (int) (scale * imh), Image.SCALE_SMOOTH);
+        } else if (wid / imw == hei / imh) {
+            scale = wid / imw;
+            im = img.getScaledInstance((int) (scale * imw), (int) (scale * imh), Image.SCALE_SMOOTH);
         }
         return im;
     }

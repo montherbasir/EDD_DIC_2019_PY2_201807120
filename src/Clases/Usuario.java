@@ -1,16 +1,21 @@
 package Clases;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class Usuario {
     private String nombre;
     private String apellido;
     private int carne;
-    private String password;
+    private byte[] password;
 
-    public Usuario(String nombre, String apellido, int carne, String password) {
+    public Usuario(String nombre, String apellido, int carne, String password) throws NoSuchAlgorithmException {
         this.nombre = nombre;
         this.apellido = apellido;
         this.carne = carne;
-        this.password = password;
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        this.password = digest.digest(password.getBytes(StandardCharsets.UTF_8));
     }
 
     public String getNombre() {
@@ -37,11 +42,12 @@ public class Usuario {
         this.carne = carne;
     }
 
-    public String getPassword() {
+    public byte[] getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String password) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        this.password = digest.digest(password.getBytes(StandardCharsets.UTF_8));;
     }
 }
