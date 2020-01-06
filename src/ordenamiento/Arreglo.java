@@ -25,6 +25,7 @@ public class Arreglo implements Runnable {
     private int alg;
     private JLabel thumb;
     private JLabel desc;
+    private  boolean op;
 
     public JLabel getDesc() {
         return desc;
@@ -91,6 +92,21 @@ public class Arreglo implements Runnable {
             mover = true;
             pausado = false;
             alg = 1;
+            op=false;
+            hilo = new Thread(this, "Bsort");
+            hilo.start();
+            Thread.sleep(200);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void BsortG() {
+        try {
+            mover = true;
+            pausado = false;
+            alg = 1;
+            op=true;
             hilo = new Thread(this, "Bsort");
             hilo.start();
             Thread.sleep(200);
@@ -128,17 +144,105 @@ public class Arreglo implements Runnable {
         print();
     }
 
+    public void bubbleSortG() throws IOException, InterruptedException {
+
+        long aux;
+        for (int i = 0; i < this.size - 1; i++) {
+            for (int j = i + 1; j < this.size; j++) {
+                try {
+                    graficar(i, j, thumb);
+                    desc.setText("Comparando " + this.arreglo[i] + " Con " + this.arreglo[j]);
+                    JOptionPane.showMessageDialog(null, "Paso Siguiente?");
+                    Thread.sleep(700);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ;
+                if (this.arreglo[i] > this.arreglo[j]) {
+                    desc.setText(this.arreglo[i] + " si es mayor, intercambio");
+                    JOptionPane.showMessageDialog(null, "Paso Siguiente?");
+                    aux = this.arreglo[i];
+                    this.arreglo[i] = this.arreglo[j];
+                    this.arreglo[j] = aux;
+                }
+                Thread.sleep(500);
+            }
+        }
+        Thread.sleep(500);
+        graficar(size - 2, size - 1, thumb);
+        desc.setText("Terminado");
+        mover = false;
+        print();
+    }
+
     public void Isort() {
         try {
             mover = true;
             pausado = false;
             alg = 2;
+            op=false;
             hilo = new Thread(this, "Isort");
             hilo.start();
             Thread.sleep(200);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void IsortG() {
+        try {
+            mover = true;
+            pausado = false;
+            alg = 2;
+            op=true;
+            hilo = new Thread(this, "Isort");
+            hilo.start();
+            Thread.sleep(200);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void insertionSortG() {
+        for (int i = 1; i < this.size; ++i) {
+            long key = this.arreglo[i];
+            int j = i - 1;
+            try {
+                graficarInsertion(i, j, key, thumb);
+                JOptionPane.showMessageDialog(null, "Paso Siguiente?");
+                Thread.sleep(1100);
+//                    System.out.println("hola "+i+" "+j);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            /* Move elements of arr[0..i-1], that are
+               greater than key, to one position ahead
+               of their current position */
+            try {
+                desc.setText("Comparando la clave " + key + " con sus antecesores");
+                Thread.sleep(500);
+                while (j >= 0 && this.arreglo[j] > key) {
+                    desc.setText("La clave " + key + " es menor que " + this.arreglo[j]);
+                    JOptionPane.showMessageDialog(null, "Paso Siguiente?");
+                    graficarInsertion(i, j, key, thumb);
+                    Thread.sleep(1100);
+                    this.arreglo[j + 1] = this.arreglo[j];
+                    j = j - 1;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            this.arreglo[j + 1] = key;
+        }
+        try {
+            Thread.sleep(200);
+            graficarInsertion(size - 1, size - 2, arreglo[size - 1], thumb);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        desc.setText("Terminado");
+        mover = false;
     }
 
     public void insertionSort() {
@@ -346,8 +450,9 @@ public class Arreglo implements Runnable {
         Process p = Runtime.getRuntime().exec(command);
         Thread.sleep(400);
         p.destroy();
+        Thread.sleep(400);
         BufferedImage img = ImageIO.read(new File("arr.png"));
-        Thread.sleep(200);
+        Thread.sleep(500);
         thumb.setIcon(new ImageIcon(scaleimage(1000, 400, img)));
     }
 
@@ -358,10 +463,18 @@ public class Arreglo implements Runnable {
                 try {
                     switch (alg) {
                         case 1:
-                            bubbleSort();
+                            if(op){
+                                bubbleSortG();
+                            }else{
+                                bubbleSort();
+                            }
                             break;
                         case 2:
-                            insertionSort();
+                            if(op){
+                                insertionSortG();
+                            }else{
+                                insertionSort();
+                            }
                             break;
                     }
                 } catch (Exception ex) {

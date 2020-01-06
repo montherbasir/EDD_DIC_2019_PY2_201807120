@@ -1,7 +1,9 @@
 package UI;
 
+import Clases.ErrorU;
 import Clases.Usuario;
 import EDD.HashTable;
+import EDD.Lista;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -10,9 +12,10 @@ import java.awt.event.ActionListener;
 public class Principal {
     JFrame m;
     public static HashTable users;
+    public static Lista<ErrorU> problematicos;
     public Principal() {
         users = new HashTable();
-
+        problematicos = new Lista<ErrorU>();
         //HashTable users = new HashTable();
         try {
             users.add(new Usuario("root","root",123,"123"));

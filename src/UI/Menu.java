@@ -45,7 +45,7 @@ public class Menu {
                 JFrame frame = new JFrame("Visualizador");
                 Animacion vis = new Animacion();
                 frame.setContentPane(vis.root);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 frame.pack();
                 frame.setVisible(true);
                 System.out.println('\n');
@@ -78,7 +78,23 @@ public class Menu {
         b4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Arreglo ar = new Arreglo(cargarArchivo(mdA));
-                ar.Bsort();
+                JFrame frame = new JFrame("Visualizador");
+                Animacion vis = new Animacion();
+                frame.setContentPane(vis.root);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frame.pack();
+                frame.setVisible(true);
+                System.out.println('\n');
+                ar.setThumb(vis.img);
+                ar.setDesc(vis.desc);
+                vis.title.setText("Bubble sort");
+                String[] options = {"Automatico", "Dirigido"};
+                int seleccion = JOptionPane.showOptionDialog(null, "Seleccione el modo", "Modo", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,null, options, options[0]);
+                if(seleccion==1){
+                    ar.BsortG();
+                }else{
+                    ar.Bsort();
+                }
             }
         });
 
@@ -86,7 +102,23 @@ public class Menu {
         b5.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Arreglo ar = new Arreglo(cargarArchivo(mdA));
-                ar.Isort();
+                JFrame frame = new JFrame("Visualizador");
+                Animacion vis = new Animacion();
+                frame.setContentPane(vis.root);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frame.pack();
+                frame.setVisible(true);
+                System.out.println('\n');
+                ar.setThumb(vis.img);
+                ar.setDesc(vis.desc);
+                vis.title.setText("Insertion sort");
+                String[] options = {"Automatico", "Dirigido"};
+                int seleccion = JOptionPane.showOptionDialog(null, "Seleccione el modo", "Modo", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,null, options, options[0]);
+                if(seleccion==1){
+                    ar.IsortG();
+                }else{
+                    ar.Isort();
+                }
             }
         });
 

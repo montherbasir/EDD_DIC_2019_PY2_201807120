@@ -31,6 +31,276 @@ class BTreeNode {
         n = 0;
     }
 
+    public int findKey(int k) {
+        int idx = 0;
+        while (idx < n && keys[idx] < k) {
+            ++idx;
+        }
+        return idx;
+    }
+
+    // A function to remove the key k from the sub-tree rooted with this node
+    public void remove(int k, BTreeNode root, JLabel thumb) throws IOException, InterruptedException {
+        System.out.println("remove");
+
+        Thread.sleep(300);
+        int idx = findKey(k);
+
+        // The key to be removed is present in this node
+        if (idx < n && keys[idx] == k) {
+            BTree.graficar(root,this,thumb);
+            // If the node is a leaf node - removeFromLeaf is called
+            // Otherwise, removeFromNonLeaf function is called
+            if (leaf){
+                removeFromLeaf(idx, root, thumb);
+            }else {
+                removeFromNonLeaf(idx, root, thumb);
+            }
+        } else {
+
+            // If this node is a leaf node, then the key is not present in tree
+            if (leaf) {
+                System.out.println("The key " + k + " is does not exist in the tree\n");
+                return;
+            }
+
+            // The key to be removed is present in the sub-tree rooted with this node
+            // The flag indicates whether the key is present in the sub-tree rooted
+            // with the last child of this node
+            boolean flag = (idx == n);
+
+            // If the child where the key is supposed to exist has less that t keys,
+            // we fill that child
+            System.out.println("idx "+idx);
+            System.out.println(C[idx].n+" t "+t);
+            if (C[idx].n < t) {
+                BTree.graficar(root, C[idx], thumb);
+                fill(idx, root, thumb);
+            }
+
+            // If the last child has been merged, it must have merged with the previous
+            // child and so we recurse on the (idx-1)th child. Else, we recurse on the
+            // (idx)th child which now has atleast t keys
+            if (flag && idx > n) {
+                C[idx - 1].remove(k, root, thumb);
+            }else {
+                C[idx].remove(k, root, thumb);
+            }
+        }
+    }
+
+    // A function to remove the idx-th key from this node - which is a leaf node
+    public void removeFromLeaf(int idx, BTreeNode root, JLabel thumb) throws IOException, InterruptedException {
+        //BTree.graficar(root,this,thumb);
+        // Move all the keys after the idx-th pos one place backward
+        System.out.println("removeFromLeaf");
+        for (int i = idx + 1; i < n; ++i) {
+            keys[i - 1] = keys[i];
+        }
+        // Reduce the count of keys
+        n--;
+        BTree.graficar(root,this,thumb);
+    }
+
+    // A function to remove the idx-th key from this node - which is a non-leaf node
+    public void removeFromNonLeaf(int idx, BTreeNode root, JLabel thumb) throws IOException, InterruptedException {
+        System.out.println("removeFromNonLeaf");
+        BTree.graficar(root,this,thumb);
+        int k = keys[idx];
+
+        // If the child that precedes k (C[idx]) has at least t keys,
+        // find the predecessor 'pred' of k in the subtree rooted at
+        // C[idx]. Replace k by pred. Recursively delete pred
+        // in C[idx]
+        if (C[idx].n >= t) {
+            int pred = getPred(idx);
+            keys[idx] = pred;
+            C[idx].remove(pred, root, thumb);
+        }
+
+        // If the child C[idx] has less that t keys, examine C[idx+1].
+        // If C[idx+1] has at least t keys, find the successor 'succ' of k in
+        // the subtree rooted at C[idx+1]
+        // Replace k by succ
+        // Recursively delete succ in C[idx+1]
+        else if (C[idx + 1].n >= t) {
+            int succ = getSucc(idx);
+            keys[idx] = succ;
+            C[idx + 1].remove(succ, root, thumb);
+        }
+
+        // If both C[idx] and C[idx+1] has less that t keys,merge k and all of C[idx+1]
+        // into C[idx]
+        // Now C[idx] contains 2t-1 keys
+        // Free C[idx+1] and recursively delete k from C[idx]
+        else {
+            merge(idx, root, thumb);
+            C[idx].remove(k, root, thumb);
+            BTree.graficar(root,this,thumb);
+        }
+
+    }
+
+    // A function to get predecessor of keys[idx]
+    public int getPred(int idx) {
+        // Keep moving to the right most node until we reach a leaf
+        BTreeNode cur = C[idx];
+        while (!cur.leaf) {
+            cur = cur.C[cur.n];
+        }
+        // Return the last key of the leaf
+        return cur.keys[cur.n - 1];
+    }
+
+    public int getSucc(int idx) {
+
+        // Keep moving the left most node starting from C[idx+1] until we reach a leaf
+        BTreeNode cur = C[idx + 1];
+        while (!cur.leaf) {
+            cur = cur.C[0];
+        }
+        // Return the first key of the leaf
+        return cur.keys[0];
+    }
+
+    // A function to fill child C[idx] which has less than t-1 keys
+    public void fill(int idx, BTreeNode root, JLabel thumb) throws IOException, InterruptedException {
+
+        // If the previous child(C[idx-1]) has more than t-1 keys, borrow a key
+        // from that child
+        if (idx != 0 && C[idx - 1].n >= t) {
+            borrowFromPrev(idx);
+        }
+            // If the next child(C[idx+1]) has more than t-1 keys, borrow a key
+            // from that child
+        else if (idx != n && C[idx + 1].n >= t) {
+            borrowFromNext(idx);
+        }
+            // Merge C[idx] with its sibling
+            // If C[idx] is the last child, merge it with with its previous sibling
+            // Otherwise merge it with its next sibling
+        else {
+            if (idx != n) {
+                merge(idx, root, thumb);
+            }else {
+                merge(idx - 1, root, thumb);
+            }
+        }
+    }
+
+    // A function to borrow a key from C[idx-1] and insert it
+    // into C[idx]
+    public void borrowFromPrev(int idx) {
+
+        BTreeNode child = C[idx];
+        BTreeNode sibling = C[idx - 1];
+
+        // The last key from C[idx-1] goes up to the parent and key[idx-1]
+        // from parent is inserted as the first key in C[idx]. Thus, the  loses
+        // sibling one key and child gains one key
+
+        // Moving all key in C[idx] one step ahead
+        for (int i = child.n - 1; i >= 0; --i) {
+            child.keys[i + 1] = child.keys[i];
+        }
+        // If C[idx] is not a leaf, move all its child pointers one step ahead
+        if (!child.leaf) {
+            for (int i = child.n; i >= 0; --i) {
+                child.C[i + 1] = child.C[i];
+            }
+        }
+
+        // Setting child's first key equal to keys[idx-1] from the current node
+        child.keys[0] = keys[idx - 1];
+
+        // Moving sibling's last child as C[idx]'s first child
+        if (!child.leaf) {
+            child.C[0] = sibling.C[sibling.n];
+        }
+        // Moving the key from the sibling to the parent
+        // This reduces the number of keys in the sibling
+        keys[idx - 1] = sibling.keys[sibling.n - 1];
+
+        child.n += 1;
+        sibling.n -= 1;
+    }
+
+    // A function to borrow a key from the C[idx+1] and place
+    // it in C[idx]
+    public void borrowFromNext(int idx) {
+
+        BTreeNode child = C[idx];
+        BTreeNode sibling = C[idx + 1];
+
+        // keys[idx] is inserted as the last key in C[idx]
+        child.keys[(child.n)] = keys[idx];
+
+        // Sibling's first child is inserted as the last child
+        // into C[idx]
+        if (!(child.leaf)) {
+            child.C[(child.n) + 1] = sibling.C[0];
+        }
+        //The first key from sibling is inserted into keys[idx]
+        keys[idx] = sibling.keys[0];
+
+        // Moving all keys in sibling one step behind
+        for (int i = 1; i < sibling.n; ++i) {
+            sibling.keys[i - 1] = sibling.keys[i];
+        }
+        // Moving the child pointers one step behind
+        if (!sibling.leaf) {
+            for (int i = 1; i <= sibling.n; ++i) {
+                sibling.C[i - 1] = sibling.C[i];
+            }
+        }
+
+        // Increasing and decreasing the key count of C[idx] and C[idx+1]
+        // respectively
+        child.n += 1;
+        sibling.n -= 1;
+    }
+
+    // A function to merge C[idx] with C[idx+1]
+    // C[idx+1] is freed after merging
+    public void merge(int idx, BTreeNode root, JLabel thumb) throws IOException, InterruptedException {
+        BTreeNode child = C[idx];
+        BTreeNode sibling = C[idx + 1];
+
+        // Pulling a key from the current node and inserting it into (t-1)th
+        // position of C[idx]
+        System.out.println("keys[idx] "+keys[idx]);
+        child.keys[t - 1] = keys[idx];
+
+        // Copying the keys from C[idx+1] to C[idx] at the end
+        for (int i = 0; i < sibling.n; ++i) {
+            System.out.println(sibling.keys[i]);
+            child.keys[i + t] = sibling.keys[i];
+        }
+        // Copying the child pointers from C[idx+1] to C[idx]
+        if (!child.leaf) {
+            for (int i = 0; i <= sibling.n; ++i) {
+                child.C[i + t] = sibling.C[i];
+            }
+        }
+
+        // Moving all keys after idx in the current node one step before -
+        // to fill the gap created by moving keys[idx] to C[idx]
+        for (int i = idx + 1; i < n; ++i) {
+            keys[i - 1] = keys[i];
+        }
+        // Moving the child pointers after (idx+1) in the current node one
+        // step before
+        for (int i = idx + 2; i <= n; ++i) {
+            C[i - 1] = C[i];
+        }
+        // Updating the key count of child and the current node
+        child.n += sibling.n + 1;
+        n--;
+
+        // Freeing the memory occupied by sibling
+        sibling = null;
+    }
+
     public String getGraph(BTreeNode val) throws InterruptedException {
 
         StringBuilder childs = new StringBuilder();
@@ -44,7 +314,7 @@ class BTreeNode {
                 childs.append("<C").append(i).append(">|");
             }
             childs.append(keys[i]);
-            if(i<n-1){
+            if (i < n - 1) {
                 childs.append("|");
             }
         }
@@ -54,7 +324,7 @@ class BTreeNode {
         }
 
         childs.append("\"");
-        if(val == this){
+        if (val == this) {
             childs.append(", color=\"green\"");
         }
         childs.append("];\n");
@@ -75,7 +345,7 @@ class BTreeNode {
     private String getConnections() throws InterruptedException {
         StringBuilder con = new StringBuilder();
 
-        for (int k = 0; k < n+1; k++) {
+        for (int k = 0; k < n + 1; k++) {
             // If this is not leaf, then before printing key[i],
             // traverse the subtree rooted with child C[i].
             if (!leaf) {
@@ -86,7 +356,6 @@ class BTreeNode {
         return con.toString();
     }
 
-    // A function to traverse all nodes in a subtree rooted with this node
     public void traverse() {
         // There are n keys and n+1 children, traverse through n keys
         // and first n children
@@ -107,8 +376,6 @@ class BTreeNode {
 
     }
 
-
-    // Function to search key k in subtree rooted with this node
     public BTreeNode search(int k) {
         // Find the first key greater than or equal to k
         int i = 0;
@@ -130,104 +397,100 @@ class BTreeNode {
         return C[i].search(k);
     }
 
-    // A utility function to insert a new key in this node
-    // The assumption is, the node must be non-full when this
-    // function is called
     public synchronized BTreeNode insertNonFull(int k, JLabel desc, BTreeNode root, JLabel thumb) throws InterruptedException, IOException {
-       synchronized (BTree.clave) {
-           // Initialize index as index of rightmost element
-           int i = n - 1;
-           BTree.graficar(root, this, thumb);
-           Thread.sleep(200);
-           // If this is a leaf node
-           if (leaf) {
-               // The following loop does two things
-               // a) Finds the location of new key to be inserted
-               // b) Moves all greater keys to one place ahead
-               while (i >= 0 && keys[i] > k) {
-                   keys[i + 1] = keys[i];
-                   i--;
-               }
+        synchronized (BTree.clave) {
+            // Initialize index as index of rightmost element
+            int i = n - 1;
+            BTree.graficar(root, this, thumb);
+            Thread.sleep(200);
+            // If this is a leaf node
+            if (leaf) {
+                // The following loop does two things
+                // a) Finds the location of new key to be inserted
+                // b) Moves all greater keys to one place ahead
+                while (i >= 0 && keys[i] > k) {
+                    keys[i + 1] = keys[i];
+                    i--;
+                }
 
-               // Insert the new key at found location
-               keys[i + 1] = k;
-               n = n + 1;
-               BTree.graficar(root, this, thumb);
-               Thread.sleep(200);
-               return this;
-           } else // If this node is not leaf
-           {
-               // Find the child which is going to have the new key
-               while (i >= 0 && keys[i] > k) {
-                   //graficar(C[0]);
-                   i--;
-               }
-               // See if the found child is full
-               if (C[i + 1].n == 2 * t - 1) {
-                   // If the child is full, then split it
-                   desc.setText("El nodo esta lleno, se separa antes de insertar");
-                   Thread.sleep(900);
-                   splitChild(i + 1, C[i + 1], desc, root, thumb);
-                   // After split, the middle key of C[i] goes up and
-                   // C[i] is splitted into two.  See which of the two
-                   // is going to have the new key
-                   if (keys[i + 1] < k) {
-                       i++;
-                   }
-               }
-               return C[i + 1].insertNonFull(k, desc, root, thumb);
-           }
-       }
+                // Insert the new key at found location
+                keys[i + 1] = k;
+                n = n + 1;
+                BTree.graficar(root, this, thumb);
+                Thread.sleep(200);
+                return this;
+            } else // If this node is not leaf
+            {
+                // Find the child which is going to have the new key
+                while (i >= 0 && keys[i] > k) {
+                    //graficar(C[0]);
+                    i--;
+                }
+                // See if the found child is full
+                if (C[i + 1].n == 2 * t - 1) {
+                    // If the child is full, then split it
+                    desc.setText("El nodo esta lleno, se separa antes de insertar");
+                    Thread.sleep(900);
+                    splitChild(i + 1, C[i + 1], desc, root, thumb);
+                    // After split, the middle key of C[i] goes up and
+                    // C[i] is splitted into two.  See which of the two
+                    // is going to have the new key
+                    if (keys[i + 1] < k) {
+                        i++;
+                    }
+                }
+                return C[i + 1].insertNonFull(k, desc, root, thumb);
+            }
+        }
     }
 
     public synchronized BTreeNode insertNonFullG(int k, JLabel desc, BTreeNode root, JLabel thumb) throws InterruptedException, IOException {
-       synchronized (BTree.clave) {
-           // Initialize index as index of rightmost element
-           int i = n - 1;
-           BTree.graficar(root, this, thumb);
-           Thread.sleep(200);
-           // If this is a leaf node
-           if (leaf) {
-               JOptionPane.showMessageDialog(null, "Paso Siguiente?");
-               // The following loop does two things
-               // a) Finds the location of new key to be inserted
-               // b) Moves all greater keys to one place ahead
-               while (i >= 0 && keys[i] > k) {
-                   keys[i + 1] = keys[i];
-                   i--;
-               }
+        synchronized (BTree.clave) {
+            // Initialize index as index of rightmost element
+            int i = n - 1;
+            BTree.graficar(root, this, thumb);
+            Thread.sleep(200);
+            // If this is a leaf node
+            if (leaf) {
+                JOptionPane.showMessageDialog(null, "Paso Siguiente?");
+                // The following loop does two things
+                // a) Finds the location of new key to be inserted
+                // b) Moves all greater keys to one place ahead
+                while (i >= 0 && keys[i] > k) {
+                    keys[i + 1] = keys[i];
+                    i--;
+                }
 
-               // Insert the new key at found location
-               keys[i + 1] = k;
-               n = n + 1;
-               BTree.graficar(root, this, thumb);
-               Thread.sleep(200);
-               return this;
-           } else // If this node is not leaf
-           {
-               // Find the child which is going to have the new key
-               while (i >= 0 && keys[i] > k) {
-                   //graficar(C[0]);
-                   i--;
-               }
-               // See if the found child is full
-               if (C[i + 1].n == 2 * t - 1) {
-                   // If the child is full, then split it
-                   desc.setText("El nodo esta lleno, se separa antes de insertar");
-                   Thread.sleep(900);
-                   splitChildG(i + 1, C[i + 1], desc, root, thumb);
-                   // After split, the middle key of C[i] goes up and
-                   // C[i] is splitted into two.  See which of the two
-                   // is going to have the new key
-                   if (keys[i + 1] < k) {
-                       i++;
-                   }
-               }
-               return C[i + 1].insertNonFullG(k, desc, root, thumb);
-           }
-       }
+                // Insert the new key at found location
+                keys[i + 1] = k;
+                n = n + 1;
+                BTree.graficar(root, this, thumb);
+                Thread.sleep(200);
+                return this;
+            } else // If this node is not leaf
+            {
+                // Find the child which is going to have the new key
+                while (i >= 0 && keys[i] > k) {
+                    //graficar(C[0]);
+                    i--;
+                }
+                // See if the found child is full
+                if (C[i + 1].n == 2 * t - 1) {
+                    // If the child is full, then split it
+                    desc.setText("El nodo esta lleno, se separa antes de insertar");
+                    Thread.sleep(900);
+                    splitChildG(i + 1, C[i + 1], desc, root, thumb);
+                    // After split, the middle key of C[i] goes up and
+                    // C[i] is splitted into two.  See which of the two
+                    // is going to have the new key
+                    if (keys[i + 1] < k) {
+                        i++;
+                    }
+                }
+                return C[i + 1].insertNonFullG(k, desc, root, thumb);
+            }
+        }
     }
-
 
     // A utility function to split the child y of this node
     // Note that y must be full when this function is called
@@ -341,7 +604,7 @@ class BTreeNode {
     }
 }
 
-public class BTree implements Runnable{
+public class BTree implements Runnable {
     BTreeNode root; // Pointer to root node
     int t;  // Minimum degree
     boolean mover;
@@ -381,22 +644,22 @@ public class BTree implements Runnable{
     public BTree(int _t) {
         root = null;
         t = _t;
-        mover=false;
+        mover = false;
     }
 
     // function to traverse the tree
     public void traverse() {
-        if (root != null){
+        if (root != null) {
             root.traverse();
         }
     }
 
-    public synchronized static void graficar(BTreeNode root,BTreeNode val, JLabel thumb) throws IOException, InterruptedException {
+    public synchronized static void graficar(BTreeNode root, BTreeNode val, JLabel thumb) throws IOException, InterruptedException {
         String g = "digraph {\n" +
                 "splines=\"line\";\n" +
                 "rankdir = TB;\n" +
                 "node [shape=record, height=0.5, width=1.5];\n" +
-                "graph[dpi=200];\n"+root.getGraph(val)+"}";
+                "graph[dpi=200];\n" + root.getGraph(val) + "}";
 
         BufferedWriter writer = new BufferedWriter(new FileWriter("btree.dot"));
         writer.write(g);
@@ -421,24 +684,24 @@ public class BTree implements Runnable{
         return (root == null) ? null : root.search(k);
     }
 
-    public void In(){
+    public void In() {
         try {
             mover = true;
             hilo = new Thread(this, "Insert");
             hilo.start();
-            op=0;
+            op = 0;
             Thread.sleep(200);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    public void InDir(){
+    public void InDir() {
         try {
             mover = true;
             hilo = new Thread(this, "Insert");
             hilo.start();
-            op=1;
+            op = 1;
             Thread.sleep(200);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -543,21 +806,62 @@ public class BTree implements Runnable{
         }
     }
 
+    public void remove(int k) throws IOException, InterruptedException {
+        if (root==null)
+        {
+            System.out.println("The tree is empty\n");
+            return;
+        }
+
+        // Call the remove function for root
+        graficar(root, root, thumb);
+        root.remove(k, root, thumb);
+
+        // If the root node has 0 keys, make its first child as the new root
+        //  if it has a child, otherwise set root as NULL
+        if (root.n==0)
+        {
+            BTreeNode tmp = root;
+            if (root.leaf) {
+                root = null;
+            }else {
+                root = root.C[0];
+                graficar(root, root, thumb);
+            }
+            // Free the old root
+            tmp=null;
+        }
+    }
 
     @Override
     public void run() {
         while (mover) {
             synchronized (clave) {
                 try {
-                    if(op==0){
-                        for(int n : numeros){
-                            desc.setText("Insertando "+n);
-                            insert(n);
-                            Thread.sleep(200);
-                        }
-                    }else{
-                        for(int n : numeros){
-                            desc.setText("Insertando "+n);
+                    if (op == 0) {
+                        insert(3);
+                        Thread.sleep(200);
+                        insert(5);
+                        Thread.sleep(200);
+                        insert(1);
+                        Thread.sleep(200);
+                        insert(87);
+                        Thread.sleep(200);
+                        insert(13);
+                        Thread.sleep(200);
+                        insert(45);
+                        Thread.sleep(200);
+                        remove(87);
+                        Thread.sleep(200);
+                        remove(45);
+//                        for (int n : numeros) {
+//                            desc.setText("Insertando " + n);
+//                            insert(n);
+//                            Thread.sleep(200);
+//                        }
+                    } else {
+                        for (int n : numeros) {
+                            desc.setText("Insertando " + n);
                             JOptionPane.showMessageDialog(null, "Paso Siguiente?");
                             insertG(n);
                             Thread.sleep(200);
@@ -565,7 +869,7 @@ public class BTree implements Runnable{
                     }
 
                     desc.setText("Finalizado");
-                    mover=false;
+                    mover = false;
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

@@ -1,28 +1,40 @@
 package UI;
 
+import Clases.ErrorU;
 import Clases.Usuario;
+
 import EDD.HashTable;
+import EDD.Lista;
 import ordenamiento.Arreglo;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
-public class Admin {
+public class Admin implements Runnable{
     JFrame mdA;
     JPanel f;
+    private Thread hilo;
+    private final Object clave = new Object();
+    private boolean mover;
+    private JLabel thumb;
+
+    public void setThumb(JLabel thumb) {
+        this.thumb = thumb;
+    }
     private  static HashTable users = Principal.users;
+    private static Lista<ErrorU> problematicos = Principal.problematicos;
     public Admin() {
         mdA = new JFrame("Modulo Administrativo");
         f = new JPanel(new GridLayout(3,2));
@@ -46,7 +58,7 @@ public class Admin {
                         JFrame frame = new JFrame("Visualizador");
                         Visualizador vis = new Visualizador();
                         frame.setContentPane(vis.rootPanel);
-                        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         frame.pack();
                         frame.setVisible(true);
                         users.setThumb(vis.thumb);
@@ -56,25 +68,18 @@ public class Admin {
             }
         });
 
-        JButton b3 = new JButton("Editar usuarios");
+        JButton b3 = new JButton("Usuarios con error");
         b3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         JFrame frame = new JFrame("Visualizador");
-                        Animacion vis = new Animacion();
-                        frame.setContentPane(vis.root);
-                        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        Visualizador vis = new Visualizador();
+                        frame.setContentPane(vis.rootPanel);
+                        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         frame.pack();
                         frame.setVisible(true);
-                        Arreglo arr = new Arreglo(new File("C:\\Users\\Monther\\Downloads\\Arreglos.json"));
-                        arr.print();
-                        System.out.println('\n');
-                        arr.setThumb(vis.img);
-                        arr.setDesc(vis.desc);
-                        vis.title.setText("Hola esto es el titulo");
-                        vis.desc.setText("esto es una descripcion de lo que esta pasando a ver que pasa con esa babosada si se que da muy graaande");
-                        arr.Bsort();
+                        graficarError(vis.thumb);
                     }
                 });
             }
@@ -156,9 +161,11 @@ public class Admin {
                         users.add(u);
                     }else{
                         System.out.println("NO VALIDO corto "+c);
+                        problematicos.add_last(new ErrorU(u,"Password muy corta"));
                     }
                 }else{
                     System.out.println("NO VALIDO repetido "+c);
+                    problematicos.add_last(new ErrorU(u,"Usuario repetido"));
                 }
             }
 
@@ -166,5 +173,73 @@ public class Admin {
             e.printStackTrace();
         }
 
+    }
+
+    private void graficarError(JLabel thumb){
+        mover=true;
+        setThumb(thumb);
+        System.out.println("Entra");
+        hilo = new Thread(this);
+        hilo.start();
+    }
+
+    private void G(JLabel thumb) throws IOException, InterruptedException {
+        StringBuilder graph = new StringBuilder("digraph G\n" +
+                "{\n" +
+                "    rankdir = TB;\n" +
+                "    dpi=300;\n"+
+                "    \n" +
+                "    node1\n" +
+                "    [\n" +
+                "        shape = none\n" +
+                "        label = <<table border=\"0\" cellspacing=\"0\">\n"+
+                "        <tr>"+
+                "        <td border=\"1\" width=\"80\">Carne</td>"+
+                "        <td border=\"1\" width=\"80\">Nombre</td>"+
+                "        <td border=\"1\" width=\"80\">Apellido</td>"+
+                "        <td border=\"1\" width=\"80\">Razon</td>"+
+                "        </tr>");
+
+        for (int y=0; y<problematicos.getSize();y++) {
+                Usuario usr = problematicos.get_element_at(y).getUser();
+                graph.append("      <tr>\n<td border=\"1\" width=\"80\">").append(usr.getCarne()).append("</td>\n");
+                graph.append("      <td border=\"1\" width=\"80\">").append(usr.getNombre()).append("</td>\n");
+                graph.append("      <td border=\"1\" width=\"80\">").append(usr.getApellido()).append("</td>\n");
+                graph.append("      <td border=\"1\" width=\"80\">").append(problematicos.get_element_at(y).getProblem()).append("</td>\n</tr>\n");
+        }
+
+        graph.append(
+                "                </table>>\n" +
+                        "    ]\n" +
+                        "}");
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter("hash.dot"));
+        writer.write(String.valueOf(graph));
+
+        writer.close();
+        Thread.sleep(300);
+
+        String command = "dot -Tpng hash.dot -o hash.png";
+        Process p = Runtime.getRuntime().exec(command);
+        Thread.sleep(1000);
+        BufferedImage img= ImageIO.read(new File("hash.png"));
+        Thread.sleep(100);
+        thumb.setIcon(new ImageIcon(Arreglo.scaleimage(3000,2000,img)));
+        System.out.println("jala");
+        mover = false;
+
+    }
+
+    @Override
+    public void run() {
+        while(mover) {
+            synchronized(clave){
+                try {
+                    G(thumb);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+        }
     }
 }
