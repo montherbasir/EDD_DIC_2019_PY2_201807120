@@ -67,7 +67,7 @@ public class Admin {
                         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                         frame.pack();
                         frame.setVisible(true);
-                        Arreglo arr = new Arreglo("C:\\Users\\Monther\\Downloads\\Arreglos.json");
+                        Arreglo arr = new Arreglo(new File("C:\\Users\\Monther\\Downloads\\Arreglos.json"));
                         arr.print();
                         System.out.println('\n');
                         arr.setThumb(vis.img);

@@ -12,8 +12,10 @@ public class Principal {
     public static HashTable users;
     public Principal() {
         users = new HashTable();
+
         //HashTable users = new HashTable();
         try {
+            users.add(new Usuario("root","root",123,"123"));
 //            users.add(new Usuario("n1", "a", 33, "1234"));
 //            users.add(new Usuario("n1", "a", 70, "1234"));
 //            users.add(new Usuario("n1", "a", 107, "1234"));

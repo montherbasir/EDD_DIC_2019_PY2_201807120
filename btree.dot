@@ -1,0 +1,11 @@
+digraph {
+splines="line";
+rankdir = TB;
+node [shape=record, height=0.5, width=1.5];
+graph[dpi=200];
+"8"[label="<C0>|8|<C1>", color="green"];
+"1"[label="1|6"];
+"45"[label="45|89|100|200|300"];
+"8":C0->"1";
+"8":C1->"45";
+}

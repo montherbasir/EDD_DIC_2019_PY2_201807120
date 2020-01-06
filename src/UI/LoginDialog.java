@@ -55,6 +55,8 @@ public class LoginDialog extends JDialog {
                     adentro = true;
                     if(getUsername().equals("admin")){
                         new Admin();
+                    }else{
+                        new Menu();
                     }
                     dispose();
                 } else {

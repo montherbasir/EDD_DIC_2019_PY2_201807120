@@ -34,7 +34,7 @@ public class Arreglo implements Runnable {
         this.desc = desc;
     }
 
-    public Arreglo(String ruta) {
+    public Arreglo(File ruta) {
         JSONParser jsonParser = new JSONParser();
 
         try (FileReader reader = new FileReader(ruta)) {
@@ -371,7 +371,7 @@ public class Arreglo implements Runnable {
         }
     }
 
-    private Image scaleimage(int wid, int hei, BufferedImage img) {
+    public static Image scaleimage(int wid, int hei, BufferedImage img) {
         Image im = img;
         double scale;
         double imw = img.getWidth();
