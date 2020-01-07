@@ -40,7 +40,7 @@ class BTreeNode {
     }
 
     // A function to remove the key k from the sub-tree rooted with this node
-    public void remove(int k, BTreeNode root, JLabel thumb) throws IOException, InterruptedException {
+    public void remove(int k, BTreeNode root, JLabel thumb, JLabel desc) throws IOException, InterruptedException {
         System.out.println("remove");
 
         Thread.sleep(300);
@@ -54,7 +54,7 @@ class BTreeNode {
             if (leaf){
                 removeFromLeaf(idx, root, thumb);
             }else {
-                removeFromNonLeaf(idx, root, thumb);
+                removeFromNonLeaf(idx, root, thumb, desc);
             }
         } else {
 
@@ -74,17 +74,71 @@ class BTreeNode {
             System.out.println("idx "+idx);
             System.out.println(C[idx].n+" t "+t);
             if (C[idx].n < t) {
+                desc.setText("Moviendo valores");
                 BTree.graficar(root, C[idx], thumb);
-                fill(idx, root, thumb);
+                fill(idx, root, thumb, desc);
             }
 
             // If the last child has been merged, it must have merged with the previous
             // child and so we recurse on the (idx-1)th child. Else, we recurse on the
             // (idx)th child which now has atleast t keys
             if (flag && idx > n) {
-                C[idx - 1].remove(k, root, thumb);
+                C[idx - 1].remove(k, root, thumb, desc);
             }else {
-                C[idx].remove(k, root, thumb);
+                C[idx].remove(k, root, thumb, desc);
+            }
+        }
+    }
+
+    public void removeG(int k, BTreeNode root, JLabel thumb, JLabel desc) throws IOException, InterruptedException {
+        System.out.println("remove");
+
+        Thread.sleep(300);
+        int idx = findKey(k);
+
+        // The key to be removed is present in this node
+        if (idx < n && keys[idx] == k) {
+            BTree.graficar(root,this,thumb);
+            // If the node is a leaf node - removeFromLeaf is called
+            // Otherwise, removeFromNonLeaf function is called
+            JOptionPane.showMessageDialog(null, "Paso Siguiente?");
+            if (leaf){
+                removeFromLeaf(idx, root, thumb);
+            }else {
+                removeFromNonLeaf(idx, root, thumb, desc);
+            }
+        } else {
+
+            // If this node is a leaf node, then the key is not present in tree
+            if (leaf) {
+                System.out.println("The key " + k + " is does not exist in the tree\n");
+                return;
+            }
+
+            // The key to be removed is present in the sub-tree rooted with this node
+            // The flag indicates whether the key is present in the sub-tree rooted
+            // with the last child of this node
+            boolean flag = (idx == n);
+
+            // If the child where the key is supposed to exist has less that t keys,
+            // we fill that child
+            System.out.println("idx "+idx);
+            System.out.println(C[idx].n+" t "+t);
+            if (C[idx].n < t) {
+                desc.setText("Moviendo valores");
+                BTree.graficar(root, C[idx], thumb);
+                //JOptionPane.showMessageDialog(null, "Paso Siguiente?");
+                fill(idx, root, thumb, desc);
+                JOptionPane.showMessageDialog(null, "Paso Siguiente?");
+            }
+
+            // If the last child has been merged, it must have merged with the previous
+            // child and so we recurse on the (idx-1)th child. Else, we recurse on the
+            // (idx)th child which now has atleast t keys
+            if (flag && idx > n) {
+                C[idx - 1].removeG(k, root, thumb, desc);
+            }else {
+                C[idx].removeG(k, root, thumb, desc);
             }
         }
     }
@@ -103,7 +157,7 @@ class BTreeNode {
     }
 
     // A function to remove the idx-th key from this node - which is a non-leaf node
-    public void removeFromNonLeaf(int idx, BTreeNode root, JLabel thumb) throws IOException, InterruptedException {
+    public void removeFromNonLeaf(int idx, BTreeNode root, JLabel thumb, JLabel desc) throws IOException, InterruptedException {
         System.out.println("removeFromNonLeaf");
         BTree.graficar(root,this,thumb);
         int k = keys[idx];
@@ -115,7 +169,7 @@ class BTreeNode {
         if (C[idx].n >= t) {
             int pred = getPred(idx);
             keys[idx] = pred;
-            C[idx].remove(pred, root, thumb);
+            C[idx].remove(pred, root, thumb, desc);
         }
 
         // If the child C[idx] has less that t keys, examine C[idx+1].
@@ -126,7 +180,7 @@ class BTreeNode {
         else if (C[idx + 1].n >= t) {
             int succ = getSucc(idx);
             keys[idx] = succ;
-            C[idx + 1].remove(succ, root, thumb);
+            C[idx + 1].remove(succ, root, thumb, desc);
         }
 
         // If both C[idx] and C[idx+1] has less that t keys,merge k and all of C[idx+1]
@@ -134,8 +188,8 @@ class BTreeNode {
         // Now C[idx] contains 2t-1 keys
         // Free C[idx+1] and recursively delete k from C[idx]
         else {
-            merge(idx, root, thumb);
-            C[idx].remove(k, root, thumb);
+            merge(idx, root, thumb, desc);
+            C[idx].remove(k, root, thumb, desc);
             BTree.graficar(root,this,thumb);
         }
 
@@ -164,34 +218,35 @@ class BTreeNode {
     }
 
     // A function to fill child C[idx] which has less than t-1 keys
-    public void fill(int idx, BTreeNode root, JLabel thumb) throws IOException, InterruptedException {
+    public void fill(int idx, BTreeNode root, JLabel thumb, JLabel desc) throws IOException, InterruptedException {
 
         // If the previous child(C[idx-1]) has more than t-1 keys, borrow a key
         // from that child
         if (idx != 0 && C[idx - 1].n >= t) {
-            borrowFromPrev(idx);
+            borrowFromPrev(idx, desc);
         }
             // If the next child(C[idx+1]) has more than t-1 keys, borrow a key
             // from that child
         else if (idx != n && C[idx + 1].n >= t) {
-            borrowFromNext(idx);
+            borrowFromNext(idx, desc);
         }
             // Merge C[idx] with its sibling
             // If C[idx] is the last child, merge it with with its previous sibling
             // Otherwise merge it with its next sibling
         else {
             if (idx != n) {
-                merge(idx, root, thumb);
+                merge(idx, root, thumb, desc);
             }else {
-                merge(idx - 1, root, thumb);
+                merge(idx - 1, root, thumb, desc);
             }
         }
     }
 
     // A function to borrow a key from C[idx-1] and insert it
     // into C[idx]
-    public void borrowFromPrev(int idx) {
-
+    public void borrowFromPrev(int idx, JLabel desc) throws InterruptedException {
+        desc.setText("Prestando de izquierda");
+        Thread.sleep(1000);
         BTreeNode child = C[idx];
         BTreeNode sibling = C[idx - 1];
 
@@ -227,8 +282,9 @@ class BTreeNode {
 
     // A function to borrow a key from the C[idx+1] and place
     // it in C[idx]
-    public void borrowFromNext(int idx) {
-
+    public void borrowFromNext(int idx, JLabel desc) throws InterruptedException {
+        desc.setText("Prestando de derecha");
+        Thread.sleep(1000);
         BTreeNode child = C[idx];
         BTreeNode sibling = C[idx + 1];
 
@@ -262,7 +318,9 @@ class BTreeNode {
 
     // A function to merge C[idx] with C[idx+1]
     // C[idx+1] is freed after merging
-    public void merge(int idx, BTreeNode root, JLabel thumb) throws IOException, InterruptedException {
+    public void merge(int idx, BTreeNode root, JLabel thumb, JLabel desc) throws IOException, InterruptedException {
+        desc.setText("Haciendo merge");
+        Thread.sleep(900);
         BTreeNode child = C[idx];
         BTreeNode sibling = C[idx + 1];
 
@@ -815,12 +873,40 @@ public class BTree implements Runnable {
 
         // Call the remove function for root
         graficar(root, root, thumb);
-        root.remove(k, root, thumb);
+        root.remove(k, root, thumb, desc);
 
         // If the root node has 0 keys, make its first child as the new root
         //  if it has a child, otherwise set root as NULL
         if (root.n==0)
         {
+            BTreeNode tmp = root;
+            if (root.leaf) {
+                root = null;
+            }else {
+                root = root.C[0];
+                graficar(root, root, thumb);
+            }
+            // Free the old root
+            tmp=null;
+        }
+    }
+
+    public void removeG(int k) throws IOException, InterruptedException {
+        if (root==null)
+        {
+            System.out.println("The tree is empty\n");
+            return;
+        }
+
+        // Call the remove function for root
+        graficar(root, root, thumb);
+        root.removeG(k, root, thumb, desc);
+
+        // If the root node has 0 keys, make its first child as the new root
+        //  if it has a child, otherwise set root as NULL
+        if (root.n==0)
+        {
+            JOptionPane.showMessageDialog(null, "Paso Siguiente?");
             BTreeNode tmp = root;
             if (root.leaf) {
                 root = null;
@@ -839,32 +925,36 @@ public class BTree implements Runnable {
             synchronized (clave) {
                 try {
                     if (op == 0) {
-                        insert(3);
-                        Thread.sleep(200);
-                        insert(5);
-                        Thread.sleep(200);
-                        insert(1);
-                        Thread.sleep(200);
-                        insert(87);
-                        Thread.sleep(200);
-                        insert(13);
-                        Thread.sleep(200);
-                        insert(45);
-                        Thread.sleep(200);
-                        remove(87);
-                        Thread.sleep(200);
-                        remove(45);
-//                        for (int n : numeros) {
-//                            desc.setText("Insertando " + n);
-//                            insert(n);
-//                            Thread.sleep(200);
-//                        }
+                        for (int n : numeros) {
+                            desc.setText("Insertando " + n);
+                            insert(n);
+                            Thread.sleep(200);
+                        }
+                        int r=-1;
+                        while(r!=1){
+                            r = JOptionPane.showConfirmDialog(null, "¿Desea eliminar un numero?");
+                            if(r==0) {
+                                int num = Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese el numero"));
+                                desc.setText("Eliminando "+num);
+                                remove(num);
+                            }
+                        }
                     } else {
                         for (int n : numeros) {
                             desc.setText("Insertando " + n);
                             JOptionPane.showMessageDialog(null, "Paso Siguiente?");
                             insertG(n);
                             Thread.sleep(200);
+                        }
+
+                        int r=-1;
+                        while(r!=1){
+                            r = JOptionPane.showConfirmDialog(null, "¿Desea eliminar un numero?");
+                            if(r==0) {
+                                int num = Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese el numero"));
+                                desc.setText("Eliminando "+num);
+                                removeG(num);
+                            }
                         }
                     }
 

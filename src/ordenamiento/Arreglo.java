@@ -189,6 +189,34 @@ public class Arreglo implements Runnable {
         }
     }
 
+    public void QuickS() {
+        try {
+            mover = true;
+            pausado = false;
+            alg = 3;
+            op=false;
+            hilo = new Thread(this, "Qsort");
+            hilo.start();
+            Thread.sleep(200);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void QuickSG() {
+        try {
+            mover = true;
+            pausado = false;
+            alg = 3;
+            op=true;
+            hilo = new Thread(this, "Qsort");
+            hilo.start();
+            Thread.sleep(200);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     public void IsortG() {
         try {
             mover = true;
@@ -291,11 +319,43 @@ public class Arreglo implements Runnable {
        smaller (smaller than pivot) to left of
        pivot and all greater elements to right
        of pivot */
-    private int partition(long[] arr, int low, int high) {
+    private int partition(long[] arr, int low, int high) throws InterruptedException, IOException {
         long pivot = arr[high];
+        desc.setText("Pivote: "+pivot);
+        Thread.sleep(1200);
+        graficarQ(-1,-1, thumb);
         int i = (low - 1); // index of smaller element
         for (int j = low; j < high; j++) {
             // If current element is smaller than the pivot
+            graficarQ(high,j,thumb);
+            if (arr[j] < pivot) {
+                i++;
+
+                // swap arr[i] and arr[j]
+                long temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+
+        // swap arr[i+1] and arr[high] (or pivot)
+        long temp = arr[i + 1];
+        arr[i + 1] = arr[high];
+        arr[high] = temp;
+
+        return i + 1;
+    }
+
+    private int partitionG(long[] arr, int low, int high) throws InterruptedException, IOException {
+        long pivot = arr[high];
+        desc.setText("Pivote: "+pivot);
+        Thread.sleep(1200);
+        graficarQ(-1,-1, thumb);
+        int i = (low - 1); // index of smaller element
+        for (int j = low; j < high; j++) {
+            // If current element is smaller than the pivot
+            graficarQ(high,j,thumb);
+            JOptionPane.showMessageDialog(null, "Paso Siguiente?");
             if (arr[j] < pivot) {
                 i++;
 
@@ -319,12 +379,13 @@ public class Arreglo implements Runnable {
       arr[] --> Array to be sorted,
       low  --> Starting index,
       high  --> Ending index */
-    private void Qsort(long[] arr, int low, int high) {
+    private void Qsort(long[] arr, int low, int high) throws IOException, InterruptedException {
         if (low < high) {
             /* pi is partitioning index, arr[pi] is
               now at right place */
             int pi = partition(arr, low, high);
-
+            graficarQ(-1,-1,thumb);
+            desc.setText("Particion: "+arreglo[pi]);
             // Recursively sort elements before
             // partition and after partition
             Qsort(arr, low, pi - 1);
@@ -332,8 +393,31 @@ public class Arreglo implements Runnable {
         }
     }
 
-    public void quickSort() {
+    private void QsortG(long[] arr, int low, int high) throws IOException, InterruptedException {
+        if (low < high) {
+            /* pi is partitioning index, arr[pi] is
+              now at right place */
+            int pi = partitionG(arr, low, high);
+            graficarQ(-1,-1,thumb);
+            desc.setText("Particion: "+arreglo[pi]);
+            JOptionPane.showMessageDialog(null, "Paso Siguiente?");
+            // Recursively sort elements before
+            // partition and after partition
+            QsortG(arr, low, pi - 1);
+            QsortG(arr, pi + 1, high);
+        }
+    }
+
+    public void quickSort() throws IOException, InterruptedException {
         Qsort(this.arreglo, 0, this.arreglo.length - 1);
+        mover=false;
+        desc.setText("Finalizado");
+    }
+
+    public void quickSortG() throws IOException, InterruptedException {
+        QsortG(this.arreglo, 0, this.arreglo.length - 1);
+        mover=false;
+        desc.setText("Finalizado");
     }
 
     public void print() {
@@ -358,6 +442,30 @@ public class Arreglo implements Runnable {
                 "        label = <<table border=\"0\" cellspacing=\"0\">\n" +
                 "                    <tr>\n" +
                 "                    <td port=\"p1\" border=\"1\" width=\"50\" bgcolor=\"#1ac6ff\">i</td>\n" +
+                "                    <td port=\"p2\" border=\"1\" width=\"50\" bgcolor=\"#00ffbf\">j</td>\n" +
+                "                    </tr>\n" +
+                "                </table>>\n" +
+                "    ]\n\n");
+
+        graphBody(graph, i, j, thumb);
+
+    }
+
+    private void graficarQ(int i, int j, JLabel thumb) throws IOException, InterruptedException {
+        StringBuilder graph = new StringBuilder("digraph G\n" +
+                "{\n" +
+                "    rankdir = TB;\n" +
+                "    dpi=200;\n" +
+                "    \"Valores:\"[shape=plaintext, fontcolor=red, fontsize=18];\n" +
+                "    \"Indices:\"[shape=plaintext, fontcolor=red, fontsize=18];\n" +
+                "    \"Valores:\" -> \"Indices:\" [color=white];\n" +
+                "    \n" +
+                "    node3\n" +
+                "    [\n" +
+                "        shape = none\n" +
+                "        label = <<table border=\"0\" cellspacing=\"0\">\n" +
+                "                    <tr>\n" +
+                "                    <td port=\"p1\" border=\"1\" width=\"50\" bgcolor=\"#1ac6ff\">pivote</td>\n" +
                 "                    <td port=\"p2\" border=\"1\" width=\"50\" bgcolor=\"#00ffbf\">j</td>\n" +
                 "                    </tr>\n" +
                 "                </table>>\n" +
@@ -474,6 +582,13 @@ public class Arreglo implements Runnable {
                                 insertionSortG();
                             }else{
                                 insertionSort();
+                            }
+                            break;
+                        case 3:
+                            if(op){
+                                quickSortG();
+                            }else{
+                                quickSort();
                             }
                             break;
                     }

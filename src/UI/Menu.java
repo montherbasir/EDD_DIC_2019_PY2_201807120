@@ -1,6 +1,7 @@
 package UI;
 
 import Clases.Usuario;
+import EDD.AVLTree;
 import EDD.BTree;
 import ordenamiento.Arreglo;
 import org.json.simple.JSONArray;
@@ -66,11 +67,25 @@ public class Menu {
         JButton b3 = new JButton("Arbol AVL");
         b3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-
-                    }
-                });
+                AVLTree t = new AVLTree();
+                t.setNumeros(cargarArregloBTree(cargarArchivo(mdA)));
+                JFrame frame = new JFrame("Visualizador");
+                Animacion vis = new Animacion();
+                frame.setContentPane(vis.root);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frame.pack();
+                frame.setVisible(true);
+                System.out.println('\n');
+                t.setThumb(vis.img);
+                t.setDesc(vis.desc);
+                vis.title.setText("Arbol AVL");
+                String[] options = {"Automatico", "Dirigido"};
+                int seleccion = JOptionPane.showOptionDialog(null, "Seleccione el modo", "Modo", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,null, options, options[0]);
+                if(seleccion==1){
+                    t.InDir();
+                }else{
+                    t.In();
+                }
             }
         });
 
@@ -122,7 +137,31 @@ public class Menu {
             }
         });
 
-        JButton b6 = new JButton("Grafos (anchura)");
+        JButton b6 = new JButton("Quick sort");
+        b6.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Arreglo ar = new Arreglo(cargarArchivo(mdA));
+                JFrame frame = new JFrame("Visualizador");
+                Animacion vis = new Animacion();
+                frame.setContentPane(vis.root);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frame.pack();
+                frame.setVisible(true);
+                System.out.println('\n');
+                ar.setThumb(vis.img);
+                ar.setDesc(vis.desc);
+                vis.title.setText("Quick sort");
+                String[] options = {"Automatico", "Dirigido"};
+                int seleccion = JOptionPane.showOptionDialog(null, "Seleccione el modo", "Modo", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,null, options, options[0]);
+                if(seleccion==1){
+                    ar.QuickSG();
+                }else{
+                    ar.QuickS();
+                }
+            }
+        });
+
+        //JButton b6 = new JButton("Grafos (anchura)");
 
         JButton b7 = new JButton("Cerrar sesion");
         b7.addActionListener(e -> SwingUtilities.invokeLater(new Runnable() {
@@ -154,7 +193,7 @@ public class Menu {
         mdA.setSize(500,300);
         mdA.setLocationRelativeTo(null);
         mdA.setVisible(true);
-        mdA.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        mdA.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private static File cargarArchivo(JFrame padre) {
